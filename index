@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Maze of No Loss</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --text-color: #c9d1d9;
+            --accent-color: #58a6ff;
+            --panel-bg: #161b22;
+            --border-color: #30363d;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            max-width: 650px;
+            width: 100%;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 24px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #8b949e;
+        }
+
+        .hud span strong {
+            color: var(--accent-color);
+        }
+
+        .story-text {
+            line-height: 1.6;
+            margin-bottom: 24px;
+            font-size: 1.1rem;
+        }
+
+        .concepts-panel {
+            background: rgba(88, 166, 255, 0.1);
+            border-left: 4px solid var(--accent-color);
+            padding: 12px;
+            margin-bottom: 24px;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.95rem;
+        }
+
+        .choices-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .choice-btn {
+            background-color: #21262d;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .choice-btn:hover {
+            background-color: #30363d;
+            border-color: #8b949e;
+            transform: translateX(4px);
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <!-- HUD: Tracks state dynamically -->
+    <div class="hud">
+        <span>Depth: <strong id="depth-val">1</strong> (<span id="phase-val">Descent</span>)</span>
+        <span>Perspective: <strong id="stat-p">1</strong> | Recall: <strong id="stat-r">1</strong></span>
+    </div>
+
+    <!-- Core Narrative Screen -->
+    <div id="story" class="story-text"></div>
+
+    <!-- Active Concepts Panel -->
+    <div id="concepts-box" class="concepts-panel hidden">
+        <strong>💡 Realization Active:</strong> <span id="concept-text"></span>
+    </div>
+
+    <!-- Action Buttons -->
+    <div id="choices" class="choices-container"></div>
+</div>
+
+<script>
+// Game State Machine
+const player = {
+    depth: 1,
+    phase: "Descent",
+    perspective: 1,
+    recall: 1,
+    hasPivot: false
+};
+
+// Database of Room Nodes
+const maze = {
+    1: {
+        text: "You stand at the absolute edge of the maze. There are no walls here, only an endless horizon of white light. Three distinct pillars stretch into the infinity above.",
+        choices: [
+            { text: "Step through the Pillar of Logic (Safe, structural route)", target: 2, bonus: { type: 'recall', val: 1 } },
+            { text: "Step through the Pillar of Chaos (Unpredictable, liquid route)", target: 'pivot_room', bonus: null },
+            { text: "Step into the Empty Gap (Looking between things)", target: 2, bonus: { type: 'perspective', val: 1 } }
+        ]
+    },
+    'pivot_room': {
+        text: "You stepped into total uncertainty. The liquid light dissolves beneath you, shifting your coordinates entirely. Instead of failing, your mind expands to observe changing patterns. You have lost nothing; you have adapted.",
+        concepts: "The Observer's Pivot (Failure does not reset you; it alters your coordinates while granting insight).",
+        choices: [
+            { text: "Synthesize this realization and move deeper", target: 2, bonus: { type: 'pivot', val: true } }
+        ]
+    },
+    2: {
+        text: "You emerge into the Hall of Fractured Mirrors. They do not reflect your body—they reflect paths you didn't take and past choices you regret. A voice echoes: 'The version of you that stumbled taught the version of you standing here.'",
+        choices: [
+            { text: "Confront a Reflection (Study your deepest past mistake)", target: 3, bonus: { type: 'recall', val: 1 } },
+            { text: "Step into the Delay (Move through the dark gap where mirrors fail to catch up)", target: 3, bonus: { type: 'perspective', val: 1 } }
+        ]
+    },
+    3: {
+        text: "You reach Depth 3: The Vault of the Core. A blinding sphere of clarity hums before you. It reveals that space, time, and failure were all constructs to help you learn. To anchor this truth, you must now carry it backwards out into the world.",
+        choices: [
+            { text: "Touch the Core and begin your Ascent outward", target: 4, phaseChange: "Ascent" }
+        ]
+    },
+    4: {
+        text: "Ascending... You are tracing your way back out, but the room transforms into an addictive loop. Flashing screens offer cheap validation and meaningless grinds to keep you from returning to the world.",
+        choices: [
+            { text: "Use your Recall to trace a structural exit pathway", target: 5, require: { stat: 'recall', val: 2 } },
+            { text: "Deliberately 'fail' a loop machine to trigger an Observer's Pivot", target: 5, require: { stat: 'pivot', val: true } },
+            { text: "Blindly force your way through the noise", target: 'trap_room', bonus: null }
+        ]
+    },
+    'trap_room': {
+        text: "The flashing loop captures your attention. In a normal game, this is a trap or a Game Over. But here, there is no loss when you learn. Experiencing the trap firsthand increases your data pool.",
+        choices: [
+            { text: "Use this fresh data to bypass the illusion permanently", target: 5, bonus: { type: 'perspective', val: 2 } }
+        ]
+    },
+    5: {
+        text: "You break through the final gateway back into ordinary human life. The noise of the world returns, but you hold the engine of reality inside you. You are ready to build maps for others.",
+        choices: [
+            { text: "Restart the Simulation", target: 1, reset: true }
+        ]
+    }
+};
+
+function renderGame() {
+    const currentRoom = maze[player.depth];
+    
+    // Update HUD display
+    document.getElementById("depth-val").textContent = typeof player.depth === 'number' ? player.depth : "Transition";
+    document.getElementById("phase-val").textContent = player.phase;
+    document.getElementById("stat-p").textContent = player.perspective;
+    document.getElementById("stat-r").textContent = player.recall;
+
+    // Set Story Content
+    document.getElementById("story").textContent = currentRoom.text;
+
+    // Handle Unlocked Concepts/Realizations UI
+    const conceptsBox = document.getElementById("concepts-box");
+    if (currentRoom.concepts) {
+        conceptsBox.classList.remove("hidden");
+        document.getElementById("concept-text").textContent = currentRoom.concepts;
+    } else if (!player.hasPivot) {
+        conceptsBox.classList.add("hidden");
+    }
+
+    // Process and Build Choice Buttons
+    const choicesContainer = document.getElementById("choices");
+    choicesContainer.innerHTML = "";
+
+    currentRoom.choices.forEach(choice => {
+        // Evaluate condition requirements if they exist
+        if (choice.require) {
+            if (choice.require.stat === 'recall' && player.recall < choice.require.val) return;
+            if (choice.require.stat === 'pivot' && !player.hasPivot) return;
+        }
+
+        const btn = document.createElement("button");
+        btn.className = "choice-btn";
+        btn.textContent = choice.text;
+        
+        btn.addEventListener("click", () => {
+            // Apply rewards/state updates on selection
+            if (choice.bonus) {
+                if (choice.bonus.type === 'perspective') player.perspective += choice.bonus.val;
+                if (choice.bonus.type === 'recall') player.recall += choice.bonus.val;
+                if (choice.bonus.type === 'pivot') {
+                    player.hasPivot = true;
+                    document.getElementById("concepts-box").classList.remove("hidden");
+                    document.getElementById("concept-text").textContent = "The Observer's Pivot (Unlocked)";
+                }
+            }
+            if (choice.phaseChange) player.phase = choice.phaseChange;
+            
+            // Handle Hard Reset Condition
+            if (choice.reset) {
+                player.depth = 1;
+                player.phase = "Descent";
+                player.perspective = 1;
+                player.recall = 1;
+                player.hasPivot = false;
+                document.getElementById("concepts-box").classList.add("hidden");
+            } else {
+                player.depth = choice.target;
+            }
+
+            renderGame();
+        });
+
+        choicesContainer.appendChild(btn);
+    });
+}
+
+// Initialize System Engine
+renderGame();
+</script>
+
+</body>
+</html>
