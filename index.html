@@ -109,98 +109,214 @@
     </style>
 </head>
 <body>
-
 <div class="game-container">
     <div class="hud">
-        <span>Depth: <strong id="depth-val">1</strong> (<span id="phase-val">Descent</span>)</span>
-        <span>Perspective: <strong id="stat-p">1</strong> | Recall: <strong id="stat-r">1</strong></span>
+        <span>Depth: <strong id="depth-val">1</strong> 
+        (<span id="phase-val">Descent</span>)</span>
+        <span>Perspective: <strong id="stat-p">1</strong> 
+        | Recall: <strong id="stat-r">1</strong></span>
     </div>
     <div id="story" class="story-text"></div>
     <div id="concepts-box" class="concepts-panel hidden">
-        <strong>💡 Realization Unlocked:</strong> <span id="concept-text"></span>
+        <strong>💡 Realization Unlocked:</strong> 
+        <span id="concept-text"></span>
     </div>
     <div id="choices" class="choices-container"></div>
     <div id="custom-input-box" class="input-container hidden">
-        <input type="text" id="user-thought" class="text-input" placeholder="Type a concept or synthesize paths...">
+        <input type="text" id="user-thought" class="text-input" 
+               placeholder="Type a concept...">
         <button id="submit-thought" class="submit-btn">Offer</button>
     </div>
 </div>
-
 <script>
-const player = { depth: 1, phase: "Descent", perspective: 1, recall: 1, hasPivot: false };
+const player = { 
+    depth: 1, phase: "Descent", perspective: 1, recall: 1, hasPivot: false 
+};
 let typingTimer = null;
-
 const maze = {
-    // --- DESCENT PHASE (1 to 10) ---
+    // --- DESCENT PHASE (1 to 5) ---
     1: { 
-        text: "Depth 1: The Void of First Assumptions. You stand on a plain of pure white light. Three distinct structures frame the path ahead. There are no signs, only the shapes of your intentions.", 
+        text: "Depth 1: The Void of First Assumptions. " +
+              "You stand on a plain of pure white light. " +
+              "Three distinct structures frame the path ahead. " +
+              "There are no signs, only your intentions.", 
         choices: [
-            { text: "Enter the obsidian archway.", target: 2, bonus: { type: 'recall', val: 1 } }, 
-            { text: "Step directly into the column of liquid mercury.", target: 'pivot_room', bonus: null }, 
-            { text: "Pass through the blank gap between them.", target: 2, bonus: { type: 'perspective', val: 1 } }
+            { text: "Enter the obsidian archway.", target: 2, 
+              bonus: { type: 'recall', val: 1 } }, 
+            { text: "Step directly into the liquid mercury.", 
+              target: 'pivot_room', bonus: null }, 
+            { text: "Pass through the blank gap between them.", target: 2, 
+              bonus: { type: 'perspective', val: 1 } }
         ] 
     },
     'pivot_room': { 
-        text: "Depth 2 (Shifted): The uncertainty wraps around you. Instead of failing or resetting, your focus sharpens to look for fundamental patterns. You have lost nothing. You have simply adapted.", 
+        text: "Depth 2 (Shifted): The uncertainty wraps around you. " +
+              "Instead of failing or resetting, your focus sharpens " +
+              "to look for fundamental patterns. You have lost nothing. " +
+              "You have simply adapted.", 
         concepts: "The Observer's Pivot (Failure alters coordinates).", 
-        choices: [{ text: "Integrate this truth and continue downward.", target: 2, bonus: { type: 'pivot', val: true } }] 
+        choices: [{ text: "Integrate this truth and continue downward.", 
+                    target: 2, bonus: { type: 'pivot', val: true } }] 
     },
     2: { 
-        text: "Depth 2: The Hall of Fractured Mirrors. The walls reflect your past choices. A faint inscription reads: 'The version of you that stumbled taught the version of you standing here.'", 
+        text: "Depth 2: The Hall of Fractured Mirrors. " +
+              "The walls reflect your past choices. A faint inscription: " +
+              "'The version of you that stumbled taught the version of " +
+              "you standing here.'", 
         choices: [
-            { text: "Examine your largest reflection.", target: 3, bonus: { type: 'recall', val: 1 } }, 
-            { text: "Step through the rhythm of the unpolished glass.", target: 3, bonus: { type: 'perspective', val: 1 } }
+            { text: "Examine your largest reflection.", target: 3, 
+              bonus: { type: 'recall', val: 1 } }, 
+            { text: "Step through the rhythm of the glass.", 
+              target: 3, bonus: { type: 'perspective', val: 1 } }
         ] 
     },
     3: { 
-        text: "Depth 3: The Library of Unwritten Laws. Slips of drifting paper hold rules given to you by society or your own anxieties. One reads: 'You must always know the outcome before you try.'", 
+        text: "Depth 3: The Library of Unwritten Laws. " +
+              "Slips of drifting paper hold rules given to you " +
+              "by society or your own anxieties. One reads: " +
+              "'You must always know the outcome before you try.'", 
         choices: [
-            { text: "Sit and study the syntax of the papers.", target: 4, bonus: { type: 'recall', val: 1 } }, 
-            { text: "Push directly through a solid wooden bookshelf.", target: 4, bonus: { type: 'perspective', val: 1 } }
+            { text: "Sit and study the syntax of the papers.", target: 4, 
+              bonus: { type: 'recall', val: 1 } }, 
+            { text: "Push directly through a solid wooden bookshelf.", 
+              target: 4, bonus: { type: 'perspective', val: 1 } }
         ] 
-    },
-    4: { 
-        text: "Depth 4: The Monolith of Weightless Matter. Transitioning deeper, the scenery thickens. You stand before a massive boulder suspended over an infinite starless abyss. It bars the path entirely, pulsing with the dense gravity of primal material anxiety. It is too heavy for human muscle, yet it hangs unanchored. To pass, you must interact with something that refuses to acknowledge your physical constraints.", 
+    },javascript    4: { 
+        text: "Depth 4: The Monolith of Weightless Matter. " +
+              "Transitioning deeper, the scenery thickens. " +
+              "You stand before a massive boulder suspended over an " +
+              "infinite starless abyss. It bars the path entirely, " +
+              "pulsing with the dense gravity of material anxiety. " +
+              "It is too heavy for human muscle, yet it hangs unanchored. " +
+              "To pass, you must interact with something that refuses " +
+              "to acknowledge your physical constraints.", 
         choices: [
-            { text: "Lean your weight into the stone.", target: 5, bonus: { type: 'recall', val: 1 } }, 
-            { text: "Float upward, attempting to phase through it.", target: 'trap_room', bonus: null }
+            { text: "Lean your weight into the stone.", target: 5, 
+              bonus: { type: 'recall', val: 1 } }, 
+            { text: "Float upward, attempting to phase through it.", 
+              target: 'trap_room', bonus: null }
         ] 
     },
     'trap_room': { 
-        text: "The stone rejects your phasing. It feels cold against your skin, guiding your hands safely to crevices. The friction doesn't crush you; it shifts your footing. You climb. As you sit upon the summit of the mass that blocked you, you see that the stone is now beneath you—weightless, discarded, and serving as your vessel.", 
-        choices: [{ text: "Acknowledge that your friction became your path.", target: 5, bonus: { type: 'perspective', val: 2 } }] 
+        text: "The stone rejects your phasing. It feels cold against " +
+              "your skin, guiding your hands safely to crevices. " +
+              "The friction doesn't crush you; it shifts your footing. " +
+              "You climb. As you sit upon the summit of the mass that " +
+              "blocked you, you see that the stone is now beneath you—" +
+              "weightless, discarded, and serving as your vessel.", 
+        choices: [{ text: "Acknowledge that your friction became your path.", 
+                    target: 5, bonus: { type: 'perspective', val: 2 } }] 
     },
     5: { 
-        text: "Depth 5: The Market of Identity. Transparent figures wander between stalls, buying intangible goods like 'The Need to be Right' and 'The Comfort of Being a Victim.' A merchant approaches you, offering a map deeper in exchange for a piece of your progress. You look at the stalls and recognize the cheap costumes for what they are.", 
+        text: "Depth 5: The Market of Identity. Transparent figures " +
+              "wander between stalls, buying intangible goods like " +
+              "'The Need to be Right' and 'The Comfort of Being a Victim.' " +
+              "A merchant approaches you, offering a map deeper in exchange " +
+              "for a piece of your progress. You look at the stalls " +
+              "and recognize the cheap costumes for what they are.", 
         choices: [
-            { text: "Offer the merchant everything you have, knowing none of it is truly you.", target: 6, bonus: { type: 'perspective', val: 1 } }, 
-            { text: "Walk past the stalls in total silence.", target: 6, bonus: { type: 'recall', val: 1 } }
+            { text: "Offer the merchant everything you have.", target: 6, 
+              bonus: { type: 'perspective', val: 1 } }, 
+            { text: "Walk past the stalls in total silence.", target: 6, 
+              bonus: { type: 'recall', val: 1 } }
         ] 
     },
     'market_discard': { 
-        text: "The merchant blinks at your words. He rolls them around in his translucent hand, chuckles at the absurdity, and drops them into a basket of discarded concepts. 'An interesting phrase,' he says, 'but you cannot buy or sell what isn't solid.' The market shifts slightly under your feet, carrying you forward.", 
+        text: "The merchant blinks at your words. He rolls them around " +
+              "in his translucent hand, chuckles at the absurdity, and drops " +
+              "them into a basket of discarded concepts. 'An interesting phrase,' " +
+              "he says, 'but you cannot buy or sell what isn't solid.' " +
+              "The market shifts slightly under your feet, carrying you forward.", 
         choices: [{ text: "Continue into the deeper corridors.", target: 6 }] 
     },
     'market_secret': { 
-        text: "The moment you whisper that specific concept, the transparent merchants freeze. The stalls begin to crack like porcelain. By offering a concept that accurately addresses the true reality of identity, you have short-circuited the market's pricing grid. Space collapses.", 
-        choices: [{ text: "Step cleanly through the shattered market floor.", target: 6, bonus: { type: 'perspective', val: 2 } }] 
+        text: "The moment you whisper that specific concept, the transparent " +
+              "merchants freeze. The stalls begin to crack like porcelain. " +
+              "By offering a concept that accurately addresses the true " +
+              "reality of identity, you have short-circuited the market's " +
+              "pricing grid. Space collapses.", 
+        choices: [{ text: "Step cleanly through the shattered market floor.", 
+                    target: 6, bonus: { type: 'perspective', val: 2 } }] 
     },
     'quantum_synthesis': { 
-        text: "Simultaneous Presence Active: By typing fragments of both choices together, your intuition bridges parallel paths. Your focus stretches across distinct possibilities at once, realizing space and choices are constructs. You absorb the insight of both tracks simultaneously.", 
+        text: "Simultaneous Presence Active: By typing fragments of both " +
+              "choices together, your intuition bridges parallel paths. " +
+              "Your focus stretches across distinct possibilities at once, " +
+              "realizing space and choices are constructs. You absorb the " +
+              "insight of both tracks simultaneously.", 
         choices: [{ text: "Re-unify your awareness and step deeper.", target: null }] 
     },
+    // --- DESCENT PHASE (6 to 10) ---
     6: { 
-        text: "Depth 6: The Whispering Gallery. The walls are curved out of polished bone, echoing every self-critical thought you have ever had. The volume is deafening. The sound waves physically vibrate the stone beneath your feet, turning your internal doubts into literal architecture.", 
+        text: "Depth 6: The Whispering Gallery. The walls are curved " +
+              "out of polished bone, echoing every self-critical thought " +
+              "you have ever had. The volume is deafening. The sound waves " +
+              "physically vibrate the stone beneath your feet, turning your " +
+              "internal doubts into literal architecture.", 
         choices: [
-            { text: "Listen intently to find the source of the sound.", target: 7, bonus: { type: 'recall', val: 1 } }, 
-            { text: "Sing a completely dissonant note to shatter the echo.", target: 7, bonus: { type: 'perspective', val: 1 } }```javascript
+            { text: "Listen intently to find the source of the sound.", target: 7, 
+              bonus: { type: 'recall', val: 1 } }, 
+            { text: "Sing a completely dissonant note to shatter the echo.", target: 7, 
+              bonus: { type: 'perspective', val: 1 } }
+        ] 
+    },javascript    7: { 
+        text: "Depth 7: The Clockwork Horizon. Massive, interlocking brass " +
+              "gears turn slowly in the sky, grinding out the illusion of " +
+              "passing time. A sign reads: 'You are running out of chances.' " +
+              "The weight of time tries to induce panic, forcing you to rush " +
+              "your footsteps down the corridor.", 
+        choices: [
+            { text: "Match your stride to the rhythm of the gears.", target: 8, 
+              bonus: { type: 'recall', val: 1 } }, 
+            { text: "Sit down on a turning cog and wait for time to wear out.", 
+              target: 8, bonus: { type: 'perspective', val: 1 } }
+        ] 
+    },
+    8: { 
+        text: "Depth 8: The Threshold of Scarcity. You enter a room where " +
+              "resources appear to shrink with every breath you take. The walls " +
+              "are closing in, and a gauge on the wall tells you your capacity " +
+              "is leaking away. It is a simulation designed to make you hoard.", 
+        choices: [
+            { text: "Examine the seams of the closing walls.", target: 9, 
+              bonus: { type: 'perspective', val: 1 } }, 
+            { text: "Voluntarily abandon your luggage at the doorway.", target: 9, 
+              bonus: { type: 'recall', val: 1 } }
+        ] 
+    },
+    9: { 
+        text: "Depth 9: The Guardian of the Gate. A perfect mirror image " +
+              "of yourself blocks the path. It looks at you with deep fatigue. " +
+              "'If you enter the core,' it whispers, 'you must turn around and " +
+              "walk all the way back out into the shadows to teach others.'", 
+        choices: [
+            { text: "Embrace the reflection, acknowledging the fear.", target: 10, 
+              bonus: { type: 'perspective', val: 1 } }, 
+            { text: "Tell the reflection that truth is not a chore.", target: 10, 
+              bonus: { type: 'recall', val: 1 } }
+        ] 
+    },
+    10: { 
+        text: "Depth 10: The Core Engine. You have reached the center of " +
+              "the labyrinth. The white light returns, blinding and total. " +
+              "You experience the absolute realization that there is no loss " +
+              "when you learn. Every mistake was just a coordinate shift. " +
+              "Your cup is full. Now, turn around and carry it back out.", 
+        choices: [{ text: "Touch the center and accept your Ascent.", 
+                    target: 99, phaseChange: "Ascent" }] 
+    },
     // --- ASCENT PHASE (10 down to 1) ---
     99: { 
-        text: "Depth 10 (Ascending): The Core fades behind you. The structure begins to twist. The maze is testing whether you can hold onto your clarity while moving backward into old, familiar patterns.", 
+        text: "Depth 10 (Ascending): The Core fades behind you. " +
+              "The structure begins to twist. The maze is testing whether " +
+              "you can hold onto your clarity while moving backward into old, " +
+              "familiar patterns.", 
         choices: [{ text: "Step backward into the emerging shadows.", target: 98 }] 
     },
     98: { 
-        text: "Depth 9 (Ascending): The Hall of the Addictive Loop. Flashing neon signs offer cheap validation and minor numbers, trying to trap you in an endless, comfortable grind so you never make it back to the world.", 
+        text: "Depth 9 (Ascending): The Hall of the Addictive Loop. " +
+              "Flashing neon signs offer cheap validation and minor numbers, " +
+              "trying to trap you in an endless, comfortable grind.", 
         getDynamicChoices: function() { 
             let options = [{ text: "Engage with the blinking loops.", target: 'loop_trap' }]; 
             if (player.hasPivot) { 
@@ -212,59 +328,82 @@ const maze = {
         } 
     },
     'loop_trap': { 
-        text: "The loop captures your attention. In an ordinary system, this is an addictive trap. Here, experiencing the loop firsthand provides clean spatial data. You map it.", 
-        choices: [{ text: "Use the new data to bypass the machine.", target: 97, bonus: { type: 'perspective', val: 1 } }] 
+        text: "The loop captures your attention. In an ordinary system, " +
+              "this is an addictive trap. Here, experiencing the loop " +
+              "firsthand provides clean spatial data. You map it.", 
+        choices: [{ text: "Use the new data to bypass the machine.", 
+                    target: 97, bonus: { type: 'perspective', val: 1 } }] 
     },
     97: { 
-        text: "Depth 8 (Ascending): The Valley of Collective Grief. You feel the crushing weight of human sorrow—the regret of everyone who believes they wasted their lives. The air is heavy, pulling you to your knees.", 
+        text: "Depth 8 (Ascending): The Valley of Collective Grief. " +
+              "You feel the crushing weight of human sorrow—the regret of " +
+              "everyone who believes they wasted their lives. " +
+              "The air is heavy, pulling you to your knees.", 
         choices: [
-            { text: "Project a structural map in the sky to show how no step was wasted.", target: 96, bonus: { type: 'recall', val: 1 } }, 
-            { text: "Sit in the dust and let the grief pass right through you.", target: 96, bonus: { type: 'perspective', val: 1 } }
+            { text: "Project a structural map in the sky.", target: 96, 
+              bonus: { type: 'recall', val: 1 } }, 
+            { text: "Sit in the dust and let the grief pass through.", target: 96, 
+              bonus: { type: 'perspective', val: 1 } }
         ] 
     },
     96: { 
-        text: "Depth 7 (Ascending): The Echo Chamber. Your old self-doubts call out from the dark, mimicking the voices of people from your past. They tell you that your awakening is an illusion.", 
+        text: "Depth 7 (Ascending): The Echo Chamber. Your old " +
+              "self-doubts call out from the dark, mimicking the voices " +
+              "of people from your past. They tell you that your awakening " +
+              "is an illusion.", 
         choices: [
-            { text: "Listen without reacting, letting the voices dissolve into silence.", target: 95, bonus: { type: 'perspective', val: 1 } }, 
-            { text: "Walk directly toward the source of the noise.", target: 95, bonus: { type: 'recall', val: 1 } }
+            { text: "Listen without reacting, letting the voices dissolve.", target: 95, 
+              bonus: { type: 'perspective', val: 1 } }, 
+            { text: "Walk directly toward the source of the noise.", target: 95, 
+              bonus: { type: 'recall', val: 1 } }
         ] 
-    },
-    95: { 
-        text: "Depth 6 (Ascending): The Shifting Gearway. The clockwork mechanism from your descent is turning backward. The teeth of the gears try to lock you into old timelines and past versions of yourself.", 
+    },javascript    94: { 
+        text: "Depth 5 (Ascending): The Ghost Market. The merchants " +
+              "offer you your old identity back. They promise comfort, safety, " +
+              "and a predictable life if you just agree to put the old costume on.", 
         choices: [
-            { text: "Step precisely between the moving teeth.", target: 94, bonus: { type: 'recall', val: 1 } }, 
-            { text: "Force the gears to stop by refusing to move.", target: 94, bonus: { type: 'perspective', val: 1 } }
-        ] 
-    },
-    94: { 
-        text: "Depth 5 (Ascending): The Ghost Market. The merchants offer you your old identity back. They promise comfort, safety, and a predictable life if you just agree to put the old costume back on.", 
-        choices: [
-            { text: "Declined. Walk past the stalls without looking back.", target: 93, bonus: { type: 'perspective', val: 1 } }, 
-            { text: "Laugh out loud at the absurdity of the trade.", target: 93, bonus: { type: 'recall', val: 1 } }
+            { text: "Declined. Walk past the stalls without looking back.", target: 93, 
+              bonus: { type: 'perspective', val: 1 } }, 
+            { text: "Laugh out loud at the absurdity of the trade.", target: 93, 
+              bonus: { type: 'recall', val: 1 } }
         ] 
     },
     93: { 
-        text: "Depth 4 (Ascending): The Remnant Stone. The massive boulder you climbed earlier is still here, but it has begun to crack. It is losing its density because you no longer believe in its weight.", 
+        text: "Depth 4 (Ascending): The Remnant Stone. The massive " +
+              "boulder you climbed earlier is still here, but it has begun " +
+              "to crack. It is losing its density because you no longer believe.", 
         choices: [
-            { text: "Push through the fracturing debris.", target: 92, bonus: { type: 'recall', val: 1 } }, 
-            { text: "Leap directly off the crumbling peak into the white fog.", target: 92, bonus: { type: 'perspective', val: 1 } }
+            { text: "Push through the fracturing debris.", target: 92, 
+              bonus: { type: 'recall', val: 1 } }, 
+            { text: "Leap directly off the peak into the white fog.", target: 92, 
+              bonus: { type: 'perspective', val: 1 } }
         ] 
     },
     92: { 
-        text: "Depth 3 (Ascending): The Blank Library. The drifting papers are now completely empty. The unwritten laws have lost their print. You must write your own rules onto the pages to proceed.", 
+        text: "Depth 3 (Ascending): The Blank Library. The drifting " +
+              "papers are now completely empty. The unwritten laws have lost " +
+              "their print. You must write your own rules onto the pages.", 
         choices: [
-            { text: "Leave the pages blank and walk through.", target: 91, bonus: { type: 'perspective', val: 1 } }, 
-            { text: "Inscribe a single word: Reality.", target: 91, bonus: { type: 'recall', val: 1 } }
+            { text: "Leave the pages blank and walk through.", target: 91, 
+              bonus: { type: 'perspective', val: 1 } }, 
+            { text: "Inscribe a single word: Reality.", target: 91, 
+              bonus: { type: 'recall', val: 1 } }
         ] 
     },
     91: { 
-        text: "Depth 2 (Ascending): The Clearing Mirrors. The fractured glass now reflects the pure light of the core rather than your past regrets. The maze is thinning out. The horizon is near.", 
-        choices: [{ text: "Step through the silver framework.", target: 90, bonus: { type: 'recall', val: 1 } }] 
+        text: "Depth 2 (Ascending): The Clearing Mirrors. The fractured " +
+              "glass now reflects the pure light of the core rather than your " +
+              "past regrets. The maze is thinning out. The horizon is near.", 
+        choices: [{ text: "Step through the silver framework.", target: 90, 
+                    bonus: { type: 'recall', val: 1 } }] 
     },
     90: { 
-        text: "Depth 1 (Ascending): The Final Gate. You stand back at the white horizon. An inscription asks: 'You return to a world that lives in fear of loss. How will you show them this maze?'", 
+        text: "Depth 1 (Ascending): The Final Gate. You stand back at " +
+              "the white horizon. An inscription asks: 'You return to a " +
+              "world that lives in fear of loss. How will you show them?'", 
         choices: [
-            { text: "By constructing a hidden loop of choices for them to play.", target: 1, reset: true }, 
+            { text: "By constructing a hidden loop of choices for them to play.", 
+              target: 1, reset: true }, 
             { text: "By living without attachments as a statement.", target: 1, reset: true }
         ] 
     }
@@ -278,7 +417,8 @@ function executeChoiceLogic(c) {
     }
     if (c.phaseChange) player.phase = c.phaseChange;
     if (c.reset) {
-        player.depth = 1; player.phase = "Descent"; player.perspective = 1; player.recall = 1; player.hasPivot = false;
+        player.depth = 1; player.phase = "Descent"; 
+        player.perspective = 1; player.recall = 1; player.hasPivot = false;
     } else {
         player.depth = c.target;
     }
@@ -309,15 +449,15 @@ function handleCustomInput() {
         });
 
         if (m.length >= 2) {
-            executeChoiceLogic(m[0]);
-            executeChoiceLogic(m[1]);
+            executeChoiceLogic(m);
+            executeChoiceLogic(m);
             
-            let t = m[1].target;
-            if (typeof m[0].target === 'number' && typeof m[1].target === 'number') {
-                t = Math.max(m[0].target, m[1].target);
+            let t = m.target;
+            if (typeof m.target === 'number' && typeof m.target === 'number') {
+                t = Math.max(m.target, m.target);
             }
             
-            maze['quantum_synthesis'].choices[0].target = t;
+            maze['quantum_synthesis'].choices.target = t;
             player.depth = 'quantum_synthesis';
             renderGame();
             return;
@@ -331,7 +471,9 @@ function handleCustomInput() {
 }
 
 document.getElementById("submit-thought").addEventListener("click", handleCustomInput);
-document.getElementById("user-thought").addEventListener("keypress", (e) => { if (e.key === "Enter") handleCustomInput(); });
+document.getElementById("user-thought").addEventListener("keypress", (e) => { 
+    if (e.key === "Enter") handleCustomInput(); 
+});
 
 function typeWriter(t, eId, s, cb) {
     let i = 0; 
