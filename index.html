@@ -160,13 +160,8 @@
         <button id="submit-thought" class="submit-btn">Offer</button>
     </div>
 </div>
-<script>// --- HIJACK STATE TRACKING CONFIG ---
-let lastInputTime = 0;
-let isHijackActive = false;
-let stillnessTimer = null;
-let savedPreHijackRoom = null;
-
-// --- GAME RESUME LOGIC ---
+<script>
+// --- GLOBAL CORE STATE VARIABLES ---
 const player = { 
     depth: 1, 
     phase: "Descent", 
@@ -177,6 +172,7 @@ const player = {
 let typingTimer = null;
 let currentRoomId = 1;
 
+// --- DYNAMIC DICTIONARY INTERACTIVE MAP ---
 const maze = {  
     1: { 
         text: "Depth 1: The Void of First Assumptions. You stand on a plain of pure white light. Three distinct structures frame the path ahead. There are no signs, only the shapes of your intentions.", 
@@ -205,7 +201,7 @@ const maze = {
             { text: "Push through a solid bookshelf.", target: 4, bonus: { type: 'perspective', val: 1 } }
         ] 
     },
-     4: { 
+    4: { 
         text: "Depth 4: The Monolith of Weightless Matter. The fantasy scenery glitches out violently, revealing the raw web grid layers. A dense, uncompiled data block bars the viewport entirely, floating over a starless digital abyss. It reads your raw input history in real-time, flashing a direct runtime alert: 'The human mind reading this line is carrying too much external friction to compile the next depth level.' You are facing an architecture that isn't testing your in-game avatar—it is testing the physical constraints of the person sitting at the keyboard.", 
         choices: [
             { text: "Lean your physical weight into the monitor console.", target: 5, bonus: { type: 'recall', val: 1 } }, 
@@ -221,14 +217,76 @@ const maze = {
         choices: [{ text: ">> Force Complete Session Restart", target: 1, bonus: null }]
     }
 };
-// --- HIGH-FREQUENCY SPAM RE-CALIBRATION ---
+
+// --- CORE RENDER LOOP LOGIC GATE ---
+function renderRoom(id) {
+    currentRoomId = id;
+    const room = maze[id];
+    
+    // Track stats elements dynamically
+    document.getElementById("depth-val").innerText = player.depth;
+    document.getElementById("phase-val").innerText = player.phase;
+    document.getElementById("stat-p").innerText = player.perspective;
+    document.getElementById("stat-r").innerText = player.recall;
+
+    // Output raw strings
+    document.getElementById("story").innerText = room.text;
+
+    // Handle insight boxes
+    const conceptBox = document.getElementById("concepts-box");
+    if (room.concepts) {
+        document.getElementById("concept-text").innerText = room.concepts;
+        conceptBox.classList.remove("hidden");
+    } else {
+        conceptBox.classList.add("hidden");
+    }
+
+    // STATE CONTROL: Explicit toggle panel rules for Depth 5 textbox persistence
+    const customInputBox = document.getElementById("custom-input-box");
+    const choicesContainer = document.getElementById("choices");
+    choicesContainer.innerHTML = "";
+
+    if (id === 5) {
+        customInputBox.classList.remove("hidden");
+    } else {
+        customInputBox.classList.add("hidden");
+    }
+    
+    // Draw action layout options
+    room.choices.forEach(choice => {
+        const btn = document.createElement("button");
+        btn.className = "choice-btn";
+        btn.innerText = choice.text;
+        btn.onclick = () => {
+            if (choice.bonus) {
+                if (choice.bonus.type === 'recall') player.recall += choice.bonus.val;
+                if (choice.bonus.type === 'perspective') player.perspective += choice.bonus.val;
+                if (choice.bonus.type === 'pivot') player.hasPivot = choice.bonus.val;
+            }
+            
+            if (typeof choice.target === 'number') {
+                player.depth = choice.target;
+            } else if (choice.target === 'pivot_room') {
+                player.depth = 2; 
+            }
+            renderRoom(choice.target);
+        };
+        choicesContainer.appendChild(btn);
+    });
+}
+
+// --- HIGH-FREQUENCY TRACKER SYSTEM ---
+let lastInputTime = 0;
+let isHijackActive = false;
+let stillnessTimer = null;
+let savedPreHijackRoom = null;
 let trackingClickCount = 0;
 let spamWindowTimer = null;
 
 function logGlobalInput(event) {
     const currentTime = Date.now();
 
-    // Condition A: Matrix override loop is running. Lock user focus down.
+    // Intercept active overrides
     if (isHijackActive) {
         event.preventDefault();
         event.stopPropagation();
@@ -240,16 +298,15 @@ function logGlobalInput(event) {
         return;
     }
 
-    // Condition B: High-frequency click track override
+    // Track active click intervals
     trackingClickCount++;
     
-    // Clear out the spam bucket if they slow down their inputs
     if (spamWindowTimer) clearTimeout(spamWindowTimer);
     spamWindowTimer = setTimeout(() => {
         trackingClickCount = 0; 
-    }, 1200); // 1.2 second resting evaluation window
+    }, 1200); 
 
-    // If they click/tap ANYWHERE on the screen 3 times rapidly, force the breach
+    // Trigger terminal bypass loop upon 3 rapid inputs anywhere
     if (trackingClickCount >= 3) {
         event.preventDefault();
         event.stopPropagation();
@@ -263,15 +320,13 @@ function logGlobalInput(event) {
 
 function triggerMatrixHijack() {
     isHijackActive = true;
-    savedPreHijackRoom = currentRoomId; // Cache state
+    savedPreHijackRoom = currentRoomId; 
 
-    // Transform Visual Layers
     document.getElementById("container-box").classList.add("hijack-active");
     document.getElementById("hud-box").classList.add("hidden");
     document.getElementById("concepts-box").classList.add("hidden");
     document.getElementById("custom-input-box").classList.add("hidden");
 
-    // Print Terminal Overlay Text
     const storyDiv = document.getElementById("story");
     storyDiv.className = "story-text hijack-text";
     storyDiv.innerHTML = `
@@ -291,21 +346,18 @@ function triggerMatrixHijack() {
 
 function startStillnessTimer() {
     if (stillnessTimer) clearTimeout(stillnessTimer);
-    
     stillnessTimer = setTimeout(() => {
         resolveMatrixHijack();
-    }, 10000); // Absolute stillness duration checkpoint: 10 Seconds
+    }, 10000); 
 }
 
 function resolveMatrixHijack() {
     isHijackActive = false;
 
-    // Restore Global Visual Parameters
     document.getElementById("container-box").classList.remove("hijack-active");
     document.getElementById("hud-box").classList.remove("hidden");
     document.getElementById("story").className = "story-text";
 
-    // Show Breakout Sequence
     const storyDiv = document.getElementById("story");
     storyDiv.innerHTML = `
         <span class='hijack-success'>[SUCCESS: Real-world architecture aligned.]</span><br><br>
@@ -313,7 +365,6 @@ function resolveMatrixHijack() {
         Welcome back to the architecture of freedom. You got in.
     `;
 
-    // Provide single return route back to normal game array loop
     const choicesContainer = document.getElementById("choices");
     choicesContainer.innerHTML = "";
     const recoverBtn = document.createElement("button");
@@ -325,13 +376,12 @@ function resolveMatrixHijack() {
     choicesContainer.appendChild(recoverBtn);
 }
 
-// --- HOOK LISTENERS AT TRUE ROOT LEVEL (EVENT CAPTURING) ---
+// --- INITIALIZE HIGHEST ROOT MONITOR EVENT HOOKS ---
 window.addEventListener('click', logGlobalInput, true);
 window.addEventListener('keydown', logGlobalInput, true);
 
-// Start Initial Execution Track
+// Run initialization routine track
 renderRoom(1);
 </script>
 </body>
 </html>
-
