@@ -435,6 +435,7 @@ window.addEventListener('keydown', logGlobalInput, true);
 
 // WIRED TEXT INTERACTION ENGINE: Controls what happens when you click "Offer"
 // WIRED TEXT INTERACTION ENGINE: Controls what happens when you click "Offer"
+// WIRED TEXT INTERACTION ENGINE: Controls what happens when you click "Offer"
 document.getElementById("submit-thought").onclick = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -463,7 +464,7 @@ document.getElementById("submit-thought").onclick = (e) => {
         You have achieved structural stability inside the core. You now hold manual override permissions to re-compile your local terminal interface colors. Select a processing frequency to style your text strings for the upcoming phase:
     `;
 
-    // Clear the active text area and choice button layouts smoothly
+    // Clear the active text area fields smoothly
     const choicesContainer = document.getElementById("choices");
     choicesContainer.innerHTML = "";
     inputField.value = ""; 
@@ -489,10 +490,13 @@ document.getElementById("submit-thought").onclick = (e) => {
         
         colorBtn.onclick = (event) => {
             event.stopPropagation();
-            // Force the primary global document font colors to adapt instantly
-            document.body.style.color = colors[colorName];
             
-            // Provide localized console confirmation tracking feedback
+            // TARGETED INNER TEXT REPAINT: Directly alters the presentation surfaces
+            document.body.style.color = colors[colorName];
+            document.getElementById("container-box").style.color = colors[colorName];
+            document.getElementById("story").style.color = colors[colorName];
+            
+            // Localized debugging feedback
             console.log(`[INTERFACE_THEME_RECONFIGURED]: ${colorName}`);
         };
         choicesContainer.appendChild(colorBtn);
