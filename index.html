@@ -275,18 +275,15 @@ function renderRoom(id) {
     });
 }
 
-// --- HIGH-FREQUENCY TRACKER SYSTEM ---
-let lastInputTime = 0;
-let isHijackActive = false;
-let stillnessTimer = null;
-let savedPreHijackRoom = null;
-let trackingClickCount = 0;
-let spamWindowTimer = null;
-
 function logGlobalInput(event) {
     const currentTime = Date.now();
 
-    // Intercept active overrides
+    // 1. SAFETY OVERRIDE: If the user is typing in a text field, ignore the spam monitor completely!
+    if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+        return; 
+    }
+
+    // Condition A: Matrix override loop is running. Lock user focus down.
     if (isHijackActive) {
         event.preventDefault();
         event.stopPropagation();
@@ -298,7 +295,7 @@ function logGlobalInput(event) {
         return;
     }
 
-    // Track active click intervals
+    // Condition B: High-frequency click track override
     trackingClickCount++;
     
     if (spamWindowTimer) clearTimeout(spamWindowTimer);
@@ -306,7 +303,7 @@ function logGlobalInput(event) {
         trackingClickCount = 0; 
     }, 1200); 
 
-    // Trigger terminal bypass loop upon 3 rapid inputs anywhere
+    // If they click/tap ANYWHERE on the background screen 3 times rapidly, force the breach
     if (trackingClickCount >= 3) {
         event.preventDefault();
         event.stopPropagation();
@@ -317,7 +314,6 @@ function logGlobalInput(event) {
         return;
     }
 }
-
 function triggerMatrixHijack() {
     isHijackActive = true;
     savedPreHijackRoom = currentRoomId; 
