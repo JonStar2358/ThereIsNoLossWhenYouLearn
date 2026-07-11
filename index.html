@@ -373,11 +373,54 @@ function resolveMatrixHijack() {
 }
 
 // --- INITIALIZE HIGHEST ROOT MONITOR EVENT HOOKS ---
+// --- HOOK LISTENERS AT TRUE ROOT LEVEL (EVENT CAPTURING) ---
 window.addEventListener('click', logGlobalInput, true);
 window.addEventListener('keydown', logGlobalInput, true);
 
-// Run initialization routine track
+// WIRED TEXT INTERACTION ENGINE: Controls what happens when you click "Offer"
+document.getElementById("submit-thought").onclick = (e) => {
+    // Force the event listeners to allow this click to process
+    e.preventDefault();
+    e.stopPropagation();
+
+    const inputField = document.getElementById("user-thought");
+    const userReflection = inputField.value.trim();
+
+    if (userReflection === "") {
+        alert("The terminal requires parameters. Type a reflection before offering.");
+        return;
+    }
+
+    // Process the input directly into your story screen layer
+    const storyDiv = document.getElementById("story");
+    storyDiv.innerHTML = `
+        <span style='color: #58a6ff; font-weight: bold;'>[PARAMETER RECORDED SUCCESSFUL]</span><br><br>
+        Your reflection has been compiled into the local database architecture:<br>
+        <i style='color: #8b949e;'>"${userReflection}"</i><br><br>
+        You have analyzed yourself first. By formalizing your thoughts into text, you have extracted the core data loops from your subconscious and projected them onto the grid layer. The memory file no longer carries execution privileges over your physical systems.<br><br>
+        The template is stable. You are ready to share this system path with others down the road.
+    `;
+
+    // Clear out choice container and text field data fields smoothly
+    document.getElementById("choices").innerHTML = "";
+    inputField.value = ""; 
+    
+    // Create a final link to smoothly loop back to the beginning of the program loop
+    const restartBtn = document.createElement("button");
+    restartBtn.className = "choice-btn";
+    restartBtn.innerText = ">> Finalize Initialization and Restart System Loop";
+    restartBtn.onclick = () => {
+        player.depth = 1;
+        player.phase = "Ascent/Integration";
+        player.perspective += 1;
+        renderRoom(1);
+    };
+    document.getElementById("choices").appendChild(restartBtn);
+};
+
+// Start Initial Execution Track
 renderRoom(1);
+</script>
 </script>
 </body>
 </html>
