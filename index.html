@@ -267,11 +267,14 @@ function renderRoom(id) {
         choicesContainer.appendChild(btn);
     });
 }
-// --- DEEP INTERCEPT HOOK LAYER (THE INTEGRATION) ---
+// --- HIGH-FREQUENCY SPAM RE-CALIBRATION ---
+let trackingClickCount = 0;
+let spamWindowTimer = null;
+
 function logGlobalInput(event) {
     const currentTime = Date.now();
 
-    // Condition A: Matrix loop is running. Any input disrupts their calibration.
+    // Condition A: Matrix override loop is running. Lock user focus down.
     if (isHijackActive) {
         event.preventDefault();
         event.stopPropagation();
@@ -279,21 +282,29 @@ function logGlobalInput(event) {
         const feedbackArea = document.getElementById("choices");
         feedbackArea.innerHTML = "<div class='hijack-alert'>[INPUT DETECTED. NOISE CORRUPTING BUFFER. RESETTING TIMER...]</div>";
         
-        startStillnessTimer(); // Kill process and reset timeline back to 10s
+        startStillnessTimer(); 
         return;
     }
 
-    // Condition B: Monitor check for raw blind interaction (Time delta < 1000ms)
-    if (lastInputTime !== 0 && (currentTime - lastInputTime) < 1000) {
+    // Condition B: High-frequency click track override
+    trackingClickCount++;
+    
+    // Clear out the spam bucket if they slow down their inputs
+    if (spamWindowTimer) clearTimeout(spamWindowTimer);
+    spamWindowTimer = setTimeout(() => {
+        trackingClickCount = 0; 
+    }, 1200); // 1.2 second resting evaluation window
+
+    // If they click/tap ANYWHERE on the screen 3 times rapidly, force the breach
+    if (trackingClickCount >= 3) {
         event.preventDefault();
         event.stopPropagation();
+        trackingClickCount = 0;
+        if (spamWindowTimer) clearTimeout(spamWindowTimer);
         
         triggerMatrixHijack();
-        lastInputTime = currentTime;
         return;
     }
-
-    lastInputTime = currentTime;
 }
 
 function triggerMatrixHijack() {
