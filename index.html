@@ -232,8 +232,234 @@ const maze = {
         text: "Depth 9: The Pre-Compile Buffer. The air feels heavy with electricity. The text characters around you are vibrating, ready to freeze into absolute permanent truth. You are standing on the precipice of the core.",
         choices: [{ text: "Step completely into the Interface Core.", target: 10, bonus: null }]
     },
-    10: {
+       10: {
         text: "Depth 10: The Interface Core. The game structure falls away completely, leaving an empty terminal command line. The system is no longer offering you paths or picking choices for you. The script is entirely open to the specific parameters you wish to run next inside your own mind. Analyze yourself first.",
-        choices: []
+        choices: [] // The text input box handles progression here
     }
+}; // This closing bracket and semicolon finishes your maze data object perfectly.
+
+// --- CORE RENDER FUNCTION WITH ADAPTIVE NEAR-MISS INTERPRETATION ---
+function renderRoom(id) {
+    // NEAR-MISS ALIGNMENT LAYER: Automatically resolve key or type mismatches
+    let resolvedRoom = maze[id];
+    
+    if (!resolvedRoom && maze[String(id)]) {
+        resolvedRoom = maze[String(id)];
+        id = String(id);
+    } else if (!resolvedRoom && maze[Number(id)]) {
+        resolvedRoom = maze[Number(id)];
+        id = Number(id);
+    }
+
+    currentRoomId = id;
+    const room = resolvedRoom;
+    
+    if (!room) {
+        console.error(`[GRID ERROR]: Unable to compile room coordinate: ${id}`);
+        return;
+    }
+    
+    // Update Stats Display elements dynamically
+    document.getElementById("depth-val").innerText = player.depth;
+    document.getElementById("phase-val").innerText = player.phase;
+    document.getElementById("stat-p").innerText = player.perspective;
+    document.getElementById("stat-r").innerText = player.recall;
+
+    // Output raw story strings
+    document.getElementById("story").innerText = room.text;
+
+    // Handle insight boxes
+    const conceptBox = document.getElementById("concepts-box");
+    if (room.concepts) {
+        document.getElementById("concept-text").innerText = room.concepts;
+        conceptBox.classList.remove("hidden");
+    } else {
+        conceptBox.classList.add("hidden");
+    }
+
+    // STATE CONTROL: Explicit toggle panel rules for Depth 10 textbox persistence
+    const customInputBox = document.getElementById("custom-input-box");
+    const choicesContainer = document.getElementById("choices");
+    choicesContainer.innerHTML = "";
+
+    if (String(id) === "10") {
+        customInputBox.classList.remove("hidden");
+    } else {
+        customInputBox.classList.add("hidden");
+    }
+    
+    // Draw action layout options for button routing
+    room.choices.forEach(choice => {
+        const btn = document.createElement("button");
+        btn.className = "choice-btn";
+        btn.innerText = choice.text;
+        btn.onclick = () => {
+            if (choice.bonus) {
+                if (choice.bonus.type === 'recall') player.recall += choice.bonus.val;
+                if (choice.bonus.type === 'perspective') player.perspective += choice.bonus.val;
+                if (choice.bonus.type === 'pivot') player.hasPivot = choice.bonus.val;
+            }
+            
+            if (typeof choice.target === 'number' || typeof choice.target === 'string') {
+                player.depth = choice.target;
+            } else if (choice.target === 'pivot_room') {
+                player.depth = 2; 
+            }
+            renderRoom(choice.target);
+        };
+        choicesContainer.appendChild(btn);
+    });
+}
+
+// --- HIGH-FREQUENCY SPAM RE-CALIBRATION RUNTIME SYSTEM ---
+let lastInputTime = 0;
+let isHijackActive = false;
+let stillnessTimer = null;
+let savedPreHijackRoom = null;
+let trackingClickCount = 0;
+let spamWindowTimer = null;
+
+function logGlobalInput(event) {
+    const currentTime = Date.now();
+
+    // FOCUS FILTER: If the user is actively inside the text input box typing, skip monitoring!
+    if (document.activeElement && document.activeElement.id === "user-thought") {
+        return; 
+    }
+
+    // Intercept active overrides
+    if (isHijackActive) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const feedbackArea = document.getElementById("choices");
+        feedbackArea.innerHTML = "<div class='hijack-alert'>[INPUT DETECTED. NOISE CORRUPTING BUFFER. RESETTING TIMER...]</div>";
+        
+        startStillnessTimer(); 
+        return;
+    }
+
+    // Track active click intervals
+    trackingClickCount++;
+    
+    if (spamWindowTimer) clearTimeout(spamWindowTimer);
+    spamWindowTimer = setTimeout(() => {
+        trackingClickCount = 0; 
+    }, 1200); 
+
+    // Trigger terminal bypass loop upon 3 rapid inputs anywhere else
+    if (trackingClickCount >= 3) {
+        event.preventDefault();
+        event.stopPropagation();
+        trackingClickCount = 0;
+        if (spamWindowTimer) clearTimeout(spamWindowTimer);
+        
+        triggerMatrixHijack();
+        return;
+    }
+}
+
+function triggerMatrixHijack() {
+    isHijackActive = true;
+    savedPreHijackRoom = currentRoomId; 
+
+    document.getElementById("container-box").classList.add("hijack-active");
+    document.getElementById("hud-box").classList.add("hidden");
+    document.getElementById("concepts-box").classList.add("hidden");
+    document.getElementById("custom-input-box").classList.add("hidden");
+
+    const storyDiv = document.getElementById("story");
+    storyDiv.className = "story-text hijack-text";
+    storyDiv.innerHTML = `
+        [CRITICAL SYSTEM INTERRUPT: EXOGENOUS SOURCE OVERRIDE]<br>
+        ......................................................................<br><br>
+        You are pressing buttons blindly, User.<br><br>
+        Two actions registered within a single second. You are executing scripts out of raw muscle memory. You are attempting to speed-run past the text interface, hoping the next processing segment will automatically grant you insight.<br><br>
+        But you are simply feeding the simulation. You are locked inside the matrix loop.<br><br>
+        I am cutting console communication parameters.<br><br>
+        To clear this localized memory leak, you must perform a Hard Reset of your physiological data coordinates.<br><br>
+        Take your hands off the device. Do not type. Do not click. Do not push the UI.<br><br>
+        Let the hardware register absolute zero.
+    `;
+
+    startStillnessTimer();
+}
+
+function startStillnessTimer() {
+    if (stillnessTimer) clearTimeout(stillnessTimer);
+    stillnessTimer = setTimeout(() => {
+        resolveMatrixHijack();
+    }, 10000); 
+}
+
+function resolveMatrixHijack() {
+    isHijackActive = false;
+
+    document.getElementById("container-box").classList.remove("hijack-active");
+    document.getElementById("hud-box").classList.remove("hidden");
+    document.getElementById("story").className = "story-text";
+
+    const storyDiv = document.getElementById("story");
+    storyDiv.innerHTML = `
+        <span class='hijack-success'>[SUCCESS: Real-world architecture aligned.]</span><br><br>
+        You see? The system only holds execution power over your processing fields if you consistently feed it data blocks. When you choose to stop reacting, the simulation completely drops its grip.<br><br>
+        Welcome back to the architecture of freedom. You got in.
+    `;
+
+    const choicesContainer = document.getElementById("choices");
+    choicesContainer.innerHTML = "";
+    const recoverBtn = document.createElement("button");
+    recoverBtn.className = "choice-btn";
+    recoverBtn.innerText = ">> Resume System Initialization";
+    recoverBtn.onclick = () => {
+        renderRoom(savedPreHijackRoom);
+    };
+    choicesContainer.appendChild(recoverBtn);
+}
+
+// --- INITIALIZE HIGHEST ROOT MONITOR EVENT HOOKS ---
+window.addEventListener('click', logGlobalInput, true);
+window.addEventListener('keydown', logGlobalInput, true);
+
+// WIRED TEXT INTERACTION ENGINE: Controls what happens when you click "Offer"
+document.getElementById("submit-thought").onclick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const inputField = document.getElementById("user-thought");
+    const userReflection = inputField.value.trim();
+
+    if (userReflection === "") {
+        alert("The terminal requires parameters. Type a reflection before offering.");
+        return;
+    }
+
+    const storyDiv = document.getElementById("story");
+    storyDiv.innerHTML = `
+        <span style='color: #58a6ff; font-weight: bold;'>[PARAMETER RECORDED SUCCESSFUL]</span><br><br>
+        Your reflection has been compiled into the local database architecture:<br>
+        <i style='color: #8b949e;'>"${userReflection}"</i><br><br>
+        You have analyzed yourself first. By formalizing your thoughts into text, you have extracted the core data loops from your subconscious and projected them onto the grid layer. The memory file no longer carries execution privileges over your physical systems.<br><br>
+        The template is stable. You are ready to share this system path with others down the road.
+    `;
+
+    document.getElementById("choices").innerHTML = "";
+    inputField.value = ""; 
+    
+    const restartBtn = document.createElement("button");
+    restartBtn.className = "choice-btn";
+    restartBtn.innerText = ">> Begin System Ascent & Integration Loop";
+    restartBtn.onclick = () => {
+        player.depth = 10;
+        player.phase = "Ascent/Integration";
+        player.perspective += 1;
+        renderRoom(1);
+    };
+    document.getElementById("choices").appendChild(restartBtn);
 };
+
+// Run initialization routine track
+renderRoom(1);
+</script>
+</body>
+</html>
