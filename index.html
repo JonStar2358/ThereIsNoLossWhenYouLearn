@@ -217,24 +217,36 @@ const maze = {
         choices: [{ text: "Cross the code bridge into the deeper layers.", target: 6, bonus: { type: 'perspective', val: 1 } }]
     },
     6: {
-        text: "Depth 6: The Chamber of Echoes. Your thoughts seem to reverberate off invisible walls. The simulation is beginning to mirror your internal frequency. The digital noise is thinning.",
-        choices: [{ text: "Descend into the quiet static.", target: 7, bonus: { type: 'recall', val: 1 } }]
+        text: "Depth 6: The Chamber of Echoes. Your thoughts reverberate off invisible layout surfaces. The simulation is beginning to mirror your internal processing frequency, thinning out the background noise. A prompt blinks in the margin: 'Are you observing the data, or is the data compiling you?'",
+        choices: [
+            { text: "Stand still and listen to the trailing resonance of your past choices.", target: 7, bonus: { type: 'recall', val: 1 } },
+            { text: "Shout directly into the layout void to test the system boundaries.", target: 7, bonus: { type: 'perspective', val: 1 } }
+        ]
     },
     7: {
-        text: "Depth 7: The Lattice of Connections. Glowing lines stretch out into the dark, mimicking a neural network. You realize this data stream isn't random—it's tracking your history.",
-        choices: [{ text: "Follow the central pathway downward.", target: 8, bonus: { type: 'perspective', val: 1 } }]
+        text: "Depth 7: The Lattice of Connections. Glowing fiber lines stretch across the dark viewport, mimicking a massive neural network. You realize this data stream isn't random environment filler—it is actively tracking your real-world key retention history.",
+        choices: [
+            { text: "Trace a single glowing line back to its source initialization block.", target: 8, bonus: { type: 'recall', val: 1 } },
+            { text: "Step away from the path to look at the network geometry from above.", target: 8, bonus: { type: 'perspective', val: 1 } }
+        ]
     },
     8: {
-        text: "Depth 8: The System Firewall. A massive, translucent grid pattern blocks the view. It doesn't look hostile; it looks like a mirror waiting for an input key.",
-        choices: [{ text: "Request operational access privileges.", target: 9, bonus: { type: 'recall', val: 1 } }]
+        text: "Depth 8: The System Firewall. A massive, translucent grid pattern bars the viewport entirely. It doesn't look like a hostile defense matrix; it looks like a clean, blank formatting screen waiting for an external hardware identity key.",
+        choices: [
+            { text: "Press your palm directly onto the glowing grid surface.", target: 9, bonus: { type: 'perspective', val: 1 } },
+            { text: "Manually input your native system tracking coordinates.", target: 9, bonus: { type: 'recall', val: 1 } }
+        ]
     },
     9: {
-        text: "Depth 9: The Pre-Compile Buffer. The air feels heavy with electricity. The text characters around you are vibrating, ready to freeze into absolute permanent truth. You are standing on the precipice of the core.",
-        choices: [{ text: "Step completely into the Interface Core.", target: 10, bonus: null }]
+        text: "Depth 9: The Pre-Compile Buffer. The air feels heavy with high-frequency electricity. The text characters surrounding you are actively vibrating, ready to freeze into absolute permanent truth. You are standing on the razor edge of the core.",
+        choices: [
+            { text: "Dive headfirst into the vibrating code stream.", target: 10, bonus: null },
+            { text: "Take one final, deliberate breath and step into the core.", target: 10, bonus: { type: 'perspective', val: 1 } }
+        ]
     },
-       10: {
+    10: {
         text: "Depth 10: The Interface Core. The game structure falls away completely, leaving an empty terminal command line. The system is no longer offering you paths or picking choices for you. The script is entirely open to the specific parameters you wish to run next inside your own mind. Analyze yourself first.",
-        choices: [] // The text input box handles progression here
+        choices: []
     }
 }; // This closing bracket and semicolon finishes your maze data object perfectly.
 
