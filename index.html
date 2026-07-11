@@ -278,8 +278,8 @@ function renderRoom(id) {
 function logGlobalInput(event) {
     const currentTime = Date.now();
 
-    // 1. SAFETY OVERRIDE: If the user is typing in a text field, ignore the spam monitor completely!
-    if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+    // FIXED SAFETY OVERRIDE: Only ignore input events if the user is actively inside the text field element itself!
+    if (event.target && event.target.id === "user-thought") {
         return; 
     }
 
@@ -314,6 +314,7 @@ function logGlobalInput(event) {
         return;
     }
 }
+
 function triggerMatrixHijack() {
     isHijackActive = true;
     savedPreHijackRoom = currentRoomId; 
