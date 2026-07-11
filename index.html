@@ -434,6 +434,7 @@ window.addEventListener('click', logGlobalInput, true);
 window.addEventListener('keydown', logGlobalInput, true);
 
 // WIRED TEXT INTERACTION ENGINE: Controls what happens when you click "Offer"
+// WIRED TEXT INTERACTION ENGINE: Controls what happens when you click "Offer"
 document.getElementById("submit-thought").onclick = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -446,28 +447,67 @@ document.getElementById("submit-thought").onclick = (e) => {
         return;
     }
 
+    // Advance phase metrics and boost stats behind the scenes
+    player.depth = 1;
+    player.phase = "Ascent/Integration";
+    player.perspective += 1;
+
+    // PRESENT THE NARRATIVE RESET EXPLANATION
     const storyDiv = document.getElementById("story");
     storyDiv.innerHTML = `
         <span style='color: #58a6ff; font-weight: bold;'>[PARAMETER RECORDED SUCCESSFUL]</span><br><br>
-        Your reflection has been compiled into the local database architecture:<br>
+        Your reflection has been successfully compiled into the core database:<br>
         <i style='color: #8b949e;'>"${userReflection}"</i><br><br>
-        You have analyzed yourself first. By formalizing your thoughts into text, you have extracted the core data loops from your subconscious and projected them onto the grid layer. The memory file no longer carries execution privileges over your physical systems.<br><br>
-        The template is stable. You are ready to share this system path with others down the road.
+        You have formalized your thoughts into text, extracting the hidden code loops from your subconscious and projecting them cleanly onto the grid layer. By analyzing your limitations, the memory file no longer carries execution privileges over your nervous system.<br><br>
+        <span style='color: #58a6ff; font-weight: bold;'>[ADMIN PRIVILEGES UNLOCKED]</span><br>
+        You have achieved structural stability inside the core. You now hold manual override permissions to re-compile your local terminal interface colors. Select a processing frequency to style your text strings for the upcoming phase:
     `;
 
-    document.getElementById("choices").innerHTML = "";
+    // Clear the active text area and choice button layouts smoothly
+    const choicesContainer = document.getElementById("choices");
+    choicesContainer.innerHTML = "";
     inputField.value = ""; 
-    
+
+    // THEME PALETTE DATA DICTIONARY
+    const colors = {
+        Red: "#ff4444",
+        Green: "#00ff00",
+        Purple: "#b19ffb",
+        Blue: "#58a6ff",
+        Pink: "#ff79c6",
+        Yellow: "#f1fa8c",
+        White: "#ffffff"
+    };
+
+    // Dynamically build interactive color selector buttons
+    Object.keys(colors).forEach(colorName => {
+        const colorBtn = document.createElement("button");
+        colorBtn.className = "choice-btn";
+        colorBtn.innerText = `[ Recompile Interface Text: ${colorName} ]`;
+        colorBtn.style.borderColor = colors[colorName];
+        colorBtn.style.color = colors[colorName];
+        
+        colorBtn.onclick = (event) => {
+            event.stopPropagation();
+            // Force the primary global document font colors to adapt instantly
+            document.body.style.color = colors[colorName];
+            
+            // Provide localized console confirmation tracking feedback
+            console.log(`[INTERFACE_THEME_RECONFIGURED]: ${colorName}`);
+        };
+        choicesContainer.appendChild(colorBtn);
+    });
+
+    // Create the final manual initiation link to step into the Ascent Phase
     const restartBtn = document.createElement("button");
     restartBtn.className = "choice-btn";
-    restartBtn.innerText = ">> Begin System Ascent & Integration Loop";
+    restartBtn.innerText = ">> Initiate Ascent & Re-enter the Architecture";
+    restartBtn.style.marginTop = "20px";
+    restartBtn.style.fontWeight = "bold";
     restartBtn.onclick = () => {
-        player.depth = 10;
-        player.phase = "Ascent/Integration";
-        player.perspective += 1;
-        renderRoom(1);
+        renderRoom(1); // Smoothly fires Depth 1 with the updated HUD panels!
     };
-    document.getElementById("choices").appendChild(restartBtn);
+    choicesContainer.appendChild(restartBtn);
 };
 
 // Run initialization routine track
